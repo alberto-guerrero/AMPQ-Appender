@@ -1,0 +1,66 @@
+﻿@page "/fetchdata"
+
+@using Web.Data
+@inject Web.Services.IEventDispatcher EventDispatcher
+
+<h1>Log Events</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Level</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var logEvent in events)
+        {
+            <tr>
+                <td style="width: 175px">@logEvent.Date.ToString("MM/dd/yyyy HH:mm:ss")</td>
+                <td style="width: 100px"><span class="badge badge-@(classLogLevel(logEvent.LogLevel))">@logEvent.LogLevel</span></td>
+                <td>@logEvent.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Common.LogEvent> events = new List<Common.LogEvent>();
+
+    protected override void OnInitialized()
+    {
+        EventDispatcher.OnLogEventReceived += (logEvent) =>
+        {
+            InvokeAsync(() =>
+            {
+                if (events.Count == 10)
+                {
+                    events.RemoveAt(0);
+                }
+                events.Add(logEvent);
+                StateHasChanged();
+            });
+        };
+    }
+
+    string classLogLevel(Microsoft.Extensions.Logging.LogLevel level)
+    {
+        switch (level)
+        {
+            case Microsoft.Extensions.Logging.LogLevel.Trace:
+                return "light";
+            case Microsoft.Extensions.Logging.LogLevel.Debug:
+                return "secondary";
+            case Microsoft.Extensions.Logging.LogLevel.Information:
+                return "info";
+            case Microsoft.Extensions.Logging.LogLevel.Warning:
+                return "warning";
+            case Microsoft.Extensions.Logging.LogLevel.Error:
+            case Microsoft.Extensions.Logging.LogLevel.Critical:
+                return "danger";
+        }
+
+        return "primary";
+    }
+}
