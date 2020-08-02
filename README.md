@@ -1,6 +1,6 @@
 # AMPQ Appender
  
-This is an example of a Mock Server using ILogger to send messages to RabbitMQ and having a Blazor app listening.
+This is an example of a Mock Service using ILogger to send messages to RabbitMQ and having a Blazor app listening.
 
 To run the project, run the following docker command (RabbitMQ):
 
